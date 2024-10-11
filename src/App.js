@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Login from './components/Login';
+import Register from './components/Register';
+import Chat from './components/Chat';
+import PrivateRoute from './components/PrivateRoute';
+import Home from './components/Home'
+import FriendList from './components/FriendList'
+import Profile from './components/Profile';
+import PendingRequest from './components/PendingRequest';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    return (
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    <Route path="/" exact element={<Home/>} />
+                    <Route path="/PendingRequest" exact element={<PendingRequest/>} />
+                    <Route path="/Profile" exact element={<Profile/>} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/FriendList" element={<FriendList />}/>
+                    <Route 
+                        path="/chat" 
+                        element={
+                            <PrivateRoute>
+                                <Chat />
+                            </PrivateRoute>
+                        } 
+                    />
+                </Routes>
+            </Router>
+        </AuthProvider>
+    );
+};
 
 export default App;
