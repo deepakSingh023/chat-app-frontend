@@ -14,7 +14,7 @@ const PendingRequest = () => {
             }
 
             try {
-                const response = await axios.get('http://localhost:5000/api/auth/pending-request', {
+                const response = await axios.get('http://localhost:5000/api/auth/pending-requests', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -43,8 +43,8 @@ const PendingRequest = () => {
         }
 
         try {
-            const response = await axios.put(
-                'http://localhost:5000/api/auth/accept-friend-request',
+            const response = await axios.post(
+                'http://localhost:5000/api/auth/accept-request',
                 { id: requestID },  
                 {
                     headers: { Authorization: `Bearer ${token}` }
