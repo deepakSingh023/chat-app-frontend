@@ -36,26 +36,26 @@ const PendingRequest = () => {
 
     const acceptFriendRequest = async (requestID) => {
         const token = localStorage.getItem('token');
-        
+        console.log('Sending friend request ID:', requestID);  // Log requestID to ensure it's valid
+    
         if (!token) {
             console.error('No token found in localStorage');
             return;
         }
-
+    
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/auth/accept-request',
-                { id: requestID },  
+                { id: requestID },  // Sending request ID
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-
-            console.log('Friend request accepted:', response.data);
+    
             setPendingRequests((prev) =>
-                prev.filter((request) => request.userId !== requestID) 
+                prev.filter((request) => request.userId !== requestID)
             );
-
+    
             alert('Friend request accepted!');
         } catch (error) {
             if (error.response) {
@@ -66,6 +66,31 @@ const PendingRequest = () => {
         }
     };
 
+    const rejectFriendRequest=async (requestID)=>{
+        const token= localStorage.getItem('token');
+
+        if (!token) {
+            console.error('No token found in localStorage');
+            return;
+        }
+
+        try{
+            const response=await axios.post('http://localhost:5000/api/auth/reject-request',
+                { id:requestID },
+                {
+                    headers:{ Authorization: `Bearer ${token}` }
+                }
+            )
+            setPendingRequests((prev) =>
+                prev.filter((request) => request.userId !== requestID)
+            );
+        }catch(error){
+            if (error.response) {
+                console.error('Error rejecting friend request:', error.response.data);
+            }
+        }
+    }
+
     return (
         <div>
             <h3>Pending Friend Requests</h3>
@@ -75,6 +100,7 @@ const PendingRequest = () => {
                         <li key={request.userId}>
                             {request.username} 
                             <button onClick={() => acceptFriendRequest(request.userId)}>Accept Friend Request</button>
+                            <button onClick={()=> rejectFriendRequest(request.userId)}>Reject Friend Request</button>
                         </li>
                     ))
                 ) : (
@@ -84,5 +110,6 @@ const PendingRequest = () => {
         </div>
     );
 };
+
 
 export default PendingRequest;

@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }) => {
     const register = async (username, password) => {
         try {
             const response = await axios.post('http://localhost:5000/api/auth/register', { username, password });
-            // Optionally, handle response after registration (e.g., auto-login)
             return response.data; // Return any useful data
         } catch (error) {
             console.error('Registration error:', error.response ? error.response.data : error.message);
