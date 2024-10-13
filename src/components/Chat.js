@@ -1,56 +1,89 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const socket = io('http://localhost:5000'); // Update with your server URL
 
-const ChatApp = ({ currentUser, selectedFriend }) => {
+const Chat = () => {
+    const { friendId } = useParams();
+    const { user } = useAuth();
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
 
     useEffect(() => {
+        console.log("Current User:", user.id);
+        console.log("Friend ID:", friendId);
+
         const fetchMessages = async () => {
-            if (!currentUser || !selectedFriend) {
-                console.error('Current user or selected friend is not defined');
+            if (!user || !friendId) {
+                console.error('User or friendId not found');
                 return;
             }
 
-            const response = await fetch(`/messages/${currentUser._id}/${selectedFriend._id}`);
-            const data = await response.json();
-            setMessages(data);
+            try {
+                const response = await axios.get(`http://localhost:5000/api/messages/${user.id}/${friendId}`, {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`, // Assuming the token is stored in the user object
+                    },
+                });
+                setMessages(response.data);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
         };
 
         fetchMessages();
 
-        // Set up socket listener for incoming messages
         socket.on('receiveMessage', (newMessage) => {
             setMessages((prevMessages) => [...prevMessages, newMessage]);
         });
 
         return () => {
-            socket.off('receiveMessage'); // Clean up the socket listener on unmount
+            socket.off('receiveMessage');
         };
-    }, [currentUser, selectedFriend]);
+    }, [user, friendId]);
 
     const sendMessage = async () => {
-        if (!currentUser || !selectedFriend) {
-            console.error('Current user or selected friend is not defined');
+        if (!user || !friendId) {
+            console.error('User or friendId not found');
             return;
         }
-
+    
         const messageData = {
-            senderId: currentUser._id,
-            receiverId: selectedFriend._id,
+            senderId: user.id,   // Ensure user.id is correct
+            receiverId: friendId,
             content: message,
         };
-
-        // Emit the message via Socket.io
-        socket.emit('sendMessage', messageData);
-        setMessage(''); // Clear the input after sending the message
+    
+        try {
+            // Send the message data to the backend
+            await axios.post('http://localhost:5000/api/messages', messageData, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            });
+    
+            // Emit the message via socket.io
+            socket.emit('sendMessage', messageData);
+    
+            // Clear the input field after sending
+            setMessage('');
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
     };
+    
+
+    // Add a loading state or conditional rendering based on user and friendId
+    if (!user || !friendId) {
+        return <div>Loading or invalid chat...</div>; // Prevent errors when user or friendId is not available
+    }
 
     return (
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-            <h1>Live Chat</h1>
+            <h1>Live Chat with Friend</h1>
             <div style={{ maxHeight: '400px', overflowY: 'auto', marginBottom: '20px', border: '1px solid #ddd', padding: '10px' }}>
                 {messages.map((msg) => (
                     <div key={msg._id} style={{ margin: '5px 0' }}>
@@ -73,4 +106,4 @@ const ChatApp = ({ currentUser, selectedFriend }) => {
     );
 };
 
-export default ChatApp;
+export default Chat;

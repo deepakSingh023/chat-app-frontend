@@ -82,6 +82,10 @@ const Profile = () => {
         navigate('/FriendList'); // Adjust the route accordingly
     };
 
+    const goToChatList = () => {
+        navigate('/ChatList'); // Adjust the route accordingly
+    };
+
     return (
         <div>
             <h1> Profile</h1>
@@ -109,6 +113,7 @@ const Profile = () => {
 
             <button onClick={goToPendingRequests}>View Pending Friend Requests</button>
             <button onClick={goToFriendList}>View Friends List</button>
+            <button onClick={goToChatList}>view chat list</button>
         </div>
     );
 };

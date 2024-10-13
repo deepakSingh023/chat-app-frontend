@@ -9,6 +9,7 @@ import Home from './components/Home'
 import FriendList from './components/FriendList'
 import Profile from './components/Profile';
 import PendingRequest from './components/PendingRequest';
+import ChatList from './components/ChatList';
 
 const App = () => {
     return (
@@ -21,8 +22,9 @@ const App = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/FriendList" element={<FriendList />}/>
+                    <Route path="ChatList" element={<ChatList/>}/>
                     <Route 
-                        path="/chat" 
+                        path="/chat/:friendId" 
                         element={
                             <PrivateRoute>
                                 <Chat />

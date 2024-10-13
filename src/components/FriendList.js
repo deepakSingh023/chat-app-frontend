@@ -23,12 +23,32 @@ const FriendList = () => {
         fetchFriends();
     }, [user]);
 
+    const removeFriend = async (friendId) => {
+        try {
+            await axios.post(
+                'http://localhost:5000/api/auth/remove-friend', // Endpoint for removing a friend
+                { friendId }, // Send the friend's ID in the body
+                {
+                    headers: { Authorization: `Bearer ${user.token}` } // Include authorization token
+                }
+            );
+
+            // Update the local state to remove the friend from the list
+            setFriends((prevFriends) => prevFriends.filter(friend => friend._id !== friendId));
+        } catch (error) {
+            console.error('Error removing friend:', error);
+        }
+    };
+
     return (
         <div>
             <h3>Friends</h3>
             <ul>
                 {friends.map(friend => (
-                    <li key={friend._id}>{friend.username}</li>
+                    <li key={friend._id}>
+                        {friend.username}
+                        <button onClick={() => removeFriend(friend._id)}>Remove</button> {/* Add Remove button */}
+                    </li>
                 ))}
             </ul>
         </div>
